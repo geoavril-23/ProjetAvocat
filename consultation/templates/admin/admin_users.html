@@ -1,0 +1,89 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Gestion Utilisateurs - FOYAK{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <!-- Formulaire de création -->
+        <div class="col-sm-12 col-xl-4">
+            <div class="bg-light rounded h-100 p-4">
+                <h6 class="mb-4 text-primary"><i class="fa fa-user-plus me-2"></i>Nouveau Compte</h6>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nom d'utilisateur (Email)</label>
+                        <input type="text" name="username" class="form-control" required placeholder="ex: maitre.durand@gmail.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email de secours</label>
+                        <input type="email" name="email" class="form-control" required placeholder="ex: contact@gmail.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mot de passe provisoire</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle</label>
+                        <select name="role" class="form-select">
+                            <option value="AVOCAT">Avocat / Juriste</option>
+                            <option value="ADMIN">Administrateur Technique</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Créer le compte</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Liste des utilisateurs -->
+        <div class="col-sm-12 col-xl-8">
+            <div class="bg-light rounded h-100 p-4 shadow-sm">
+                <h6 class="mb-4">Membres du Cabinet</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Utilisateur</th>
+                                <th>Rôle</th>
+                                <th>Date d'ajout</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="ms-2">
+                                            <h6 class="mb-0">{{ u.username }}</h6>
+                                            <small>{{ u.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if u.profile.role == 'ADMIN' %}
+                                        <span class="badge bg-warning text-dark">ADMIN</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">AVOCAT</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ u.date_joined|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if not u.is_superuser %}
+                                    <a href="{% url 'admin_delete_user' u.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cet utilisateur ?');">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted small">Protégé</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Accès Cabinet - FOYAK TOGO</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'admin/css/bootstrap.min.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #38bdf8;
+            --primary-hover: #0ea5e9;
+            --bg-dark: #000000;
+            --card-bg: rgba(15, 15, 15, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Elements */
+        .bg-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(50px);
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(-50%, -50%); }
+            to { transform: translate(20%, 30%); }
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brand-logo i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.3));
+        }
+
+        .brand-logo h1 {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-left: 5px;
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid var(--border-color) !important;
+            color: #ffffff !important;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1) !important;
+        }
+
+        .btn-login {
+            background: var(--primary);
+            border: none;
+            color: #000000;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 14px;
+            width: 100%;
+            border-radius: 14px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-login:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.5);
+        }
+
+        .btn-login:active { transform: translateY(0); }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            color: var(--text-muted);
+            text-decoration: none !important;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover { color: #ffffff; }
+        .back-link i { margin-right: 8px; font-size: 0.8rem; }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-msg {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            color: #7dd3fc;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <div class="login-card">
+        <div class="brand-logo">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <h1>FOYAK <span style="font-weight: 300; opacity: 0.7;">TOGO</span></h1>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'info' %}info-msg{% else %}error-msg{% endif %}">
+                    <i class="fas {% if message.tags == 'info' %}fa-info-circle{% else %}fa-circle-exclamation{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            
+            {% if request.user.is_authenticated %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'admin_logout' %}" class="btn btn-outline-danger w-100" style="border-radius: 12px; padding: 10px;">
+                        <i class="fas fa-sign-out-alt"></i> Se déconnecter pour changer de compte
+                    </a>
+                    <a href="{% url 'admin_dashboard' %}" class="back-link mt-4">Continuer vers mon espace actuel</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if not request.user.is_authenticated %}
+        <form method="POST" action="{% url 'admin_login' %}">
+            {% csrf_token %}
+            <div class="input-group-custom">
+                <label for="username" class="form-label">Identifiant Cabinet</label>
+                <input type="text" class="form-control" id="username" name="username" required placeholder="nom.utilisateur" autocomplete="username">
+            </div>
+            
+            <div class="input-group-custom mt-4">
+                <label for="password" class="form-label">Code d'accès</label>
+                <input type="password" class="form-control" id="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login">Accéder à l'Espace Cabinet</button>
+        </form>
+        {% endif %}
+
+        <a href="{% url 'index' %}" class="back-link">
+            <i class="fa fa-chevron-left"></i> Retour au portail public
+        </a>
+    </div>
+
+</body>
+</html>

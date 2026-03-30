@@ -1,0 +1,63 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Toutes les Consultations - FOYAK Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light text-center rounded p-4 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h6 class="mb-0"><i class="fa fa-comments me-2 text-primary"></i>Toutes les Consultations</h6>
+        </div>
+        <div class="table-responsive">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead>
+                    <tr class="text-dark">
+                        <th scope="col">Date</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Téléphone</th>
+                        <th scope="col">Domaine</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Statut</th>
+                        {% if request.user.profile.role == 'ADMIN' %}
+                        <th scope="col" class="text-center">Action</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in demandes %}
+                    <tr>
+                        <td>{{ d.date_creation|date:"d M Y H:i" }}</td>
+                        <td><strong>{{ d.nom }} {{ d.prenom }}</strong></td>
+                        <td><a href="mailto:{{ d.email }}">{{ d.email }}</a></td>
+                        <td>{{ d.telephone }}</td>
+                        <td>{{ d.get_domaine_display }}</td>
+                        <td><small>{{ d.description|truncatewords:6 }}</small></td>
+                        <td>
+                            {% if d.statut == 'ATTENTE' %}
+                            <span class="badge bg-warning text-dark">En Attente</span>
+                            {% elif d.statut == 'EN_COURS' %}
+                            <span class="badge bg-primary">En Cours</span>
+                            {% else %}
+                            <span class="badge bg-success">Terminé</span>
+                            {% endif %}
+                        </td>
+                        {% if request.user.profile.role == 'ADMIN' %}
+                        <td class="text-center">
+                            <a href="{% url 'admin_edit_demande' d.id %}" class="btn btn-sm btn-outline-info me-1"><i class="fa fa-edit"></i></a>
+                            <a href="{% url 'admin_delete_demande' d.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer définitivement ce dossier ?');"><i class="fa fa-trash"></i></a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Aucune demande de consultation trouvée.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

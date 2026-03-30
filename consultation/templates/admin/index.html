@@ -1,0 +1,156 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-users fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Visiteurs</p>
+                    <h6 class="mb-0">{{ nb_visiteurs }}</h6>
+                </div>
+            </div>
+        </div>
+        {% if request.user.profile.role == 'AVOCAT' %}
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-balance-scale fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Total Demandes</p>
+                    <h6 class="mb-0">{{ total_demandes }}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-clock fa-3x text-warning"></i>
+                <div class="ms-3">
+                    <p class="mb-2">En Attente</p>
+                    <h6 class="mb-0">{{ nb_en_attente }}</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-check-circle fa-3x text-success"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Traitées</p>
+                    <h6 class="mb-0">{{ nb_termines }}</h6>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Filtres -->
+    <div class="mb-4 d-flex justify-content-end">
+        <div class="btn-group" role="group">
+            <a href="?filter=jour" class="btn btn-outline-primary {% if current_filter == 'jour' %}active{% endif %}">Aujourd'hui</a>
+            <a href="?filter=semaine" class="btn btn-outline-primary {% if current_filter == 'semaine' %}active{% endif %}">Cette Semaine</a>
+            <a href="?filter=mois" class="btn btn-outline-primary {% if current_filter == 'mois' %}active{% endif %}">Ce Mois</a>
+            <a href="?" class="btn btn-outline-primary {% if not current_filter %}active{% endif %}">Tout</a>
+        </div>
+    </div>
+
+    {% if request.user.profile.role == 'AVOCAT' %}
+    <div class="row g-4">
+        <!-- En Attente -->
+        <div class="col-12 col-xl-4">
+            <div class="bg-light rounded h-100 p-4 border-top border-5 border-warning">
+                <h6 class="mb-4">Demandes en Attente</h6>
+                {% for d in demandes_attente %}
+                <div class="d-flex align-items-center border-bottom py-3">
+                    <div class="w-100 ms-3">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-0">{{ d.nom }} {{ d.prenom }}</h6>
+                            <small>{{ d.date_creation|date:"d M H:i" }}</small>
+                        </div>
+                        <span>{{ d.get_domaine_display }}</span><br>
+                        {% if d.description %}
+                        <small class="text-muted">{{ d.description|truncatewords:10 }}</small>
+                        {% endif %}
+                        <div class="mt-2 text-end">
+                            <form action="{% url 'update_statut_demande' d.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="nouveau_statut" value="EN_COURS">
+                                <button type="submit" class="btn btn-sm btn-warning">Prendre le Cas</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center pt-3">Aucune demande en attente.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- En Cours -->
+        <div class="col-12 col-xl-4">
+            <div class="bg-light rounded h-100 p-4 border-top border-5 border-primary">
+                <h6 class="mb-4">Services en Cours</h6>
+                {% for d in demandes_en_cours %}
+                <div class="d-flex align-items-center border-bottom py-3">
+                    <div class="w-100 ms-3">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-0">{{ d.nom }} {{ d.prenom }}</h6>
+                            <small>{{ d.date_creation|date:"d M H:i" }}</small>
+                        </div>
+                        <span>{{ d.get_domaine_display }}</span><br>
+                        <div class="mt-2 text-end">
+                            <form action="{% url 'update_statut_demande' d.id %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="nouveau_statut" value="TERMINE">
+                                <button type="submit" class="btn btn-sm btn-success">Marquer Terminé</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center pt-3">Aucun service en cours.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Terminés -->
+        <div class="col-12 col-xl-4">
+            <div class="bg-light rounded h-100 p-4 border-top border-5 border-success">
+                <h6 class="mb-4">Cas Terminés</h6>
+                {% for d in demandes_terminees %}
+                <div class="d-flex align-items-center border-bottom py-3">
+                    <div class="w-100 ms-3">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-0">{{ d.nom }} {{ d.prenom }}</h6>
+                            <small>{{ d.date_cloture|date:"d M Y" }}</small>
+                        </div>
+                        <span class="text-success small"><i class="fa fa-check-circle me-1"></i> Service Délivré</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center pt-3">Aucun cas terminé.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Vue Admin : Message d'accueil ou résumé technique -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="bg-light rounded p-5 text-center shadow-sm border border-warning">
+                <div class="mb-4">
+                    <i class="fa fa-shield-alt fa-4x text-warning"></i>
+                </div>
+                <h3 class="mb-3">Espace Administration Technique</h3>
+                <p class="lead mb-4">Vous êtes connecté au centre de contrôle. Pour préserver le secret professionnel, les dossiers juridiques détaillés sont accessibles uniquement via les comptes Avocats.</p>
+                <div class="pt-3">
+                    <a href="{% url 'admin_settings' %}" class="btn btn-warning btn-lg px-5">
+                        <i class="fa fa-cog me-2"></i>Gérer la Configuration
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Paramètres - FOYAK Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4 justify-content-center">
+        <div class="col-sm-12 col-xl-8">
+            <div class="bg-light rounded h-100 p-4 mb-4">
+                <h6 class="mb-4 text-primary">Préférences Personnelles</h6>
+                <form action="{% url 'admin_settings' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <label for="theme_perso" class="col-sm-3 col-form-label">Mon Thème</label>
+                        <div class="col-sm-9">
+                            <select class="form-select mb-3" name="theme_perso" id="theme_perso">
+                                <option value="LIGHT" {% if profile.theme_pref == 'LIGHT' %}selected{% endif %}>Mode Clair</option>
+                                <option value="DARK" {% if profile.theme_pref == 'DARK' %}selected{% endif %}>Mode Sombre</option>
+                            </select>
+                            <small class="form-text text-muted">Ce réglage s'applique uniquement à votre session.</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-outline-primary">Mettre à jour mon profil</button>
+                    </div>
+                </form>
+            </div>
+
+            {% if request.user.profile.role == 'ADMIN' %}
+            <div class="bg-light rounded p-4 border border-warning shadow-sm mt-5 mb-5">
+                <h6 class="mb-4 text-warning"><i class="fa fa-shield-alt me-2"></i>Configuration du Cabinet</h6>
+                <form action="{% url 'admin_settings' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <label for="nom_cabinet" class="col-sm-3 col-form-label">Nom du Cabinet</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="nom_cabinet" id="nom_cabinet" value="{{ config.nom_cabinet }}">
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-primary">Enregistrer les réglages globaux</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% block footer %}{% endblock %}
+{% endblock %}
