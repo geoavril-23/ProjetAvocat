@@ -28,6 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%q=1h_ia#7k2+m92+5dy=
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*'] # Permet toutes les adresses sur Railway
+CSRF_TRUSTED_ORIGINS = ['https://*.railway.app'] # Autorise les domaines Railway pour la sécurité des formulaires
 
 
 
@@ -84,12 +85,28 @@ WSGI_APPLICATION = 'projetAvocat.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Database logic using dj-database-url (Automatic for Railway)
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://postgres:3432@127.0.0.1:5432/avocat',
-        conn_max_age=600
-    )
-}
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+    }
+else:
+    # Si on est sur Railway (détecté par la présence de RAILWAY_ENVIRONMENT) mais sans DATABASE_URL
+    if os.environ.get('RAILWAY_ENVIRONMENT'):
+         raise Exception("ERREUR CRITIQUE : La variable DATABASE_URL est manquante dans Railway ! Reliez la base de données au service Web.")
+    
+    # Fallback pour le développement local
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'avocat',
+            'USER': 'postgres',
+            'PASSWORD': '3432',
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+        }
+    }
 
 
 
